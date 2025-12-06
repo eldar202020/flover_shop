@@ -3,14 +3,12 @@ module.exports = (sequelize, Sequelize) => {
     Id_product: {
       type: Sequelize.INTEGER
     },
+    Id_sale: {
+      type: Sequelize.INTEGER
+    },
     quanity: {
       type: Sequelize.INTEGER
     },
-    Sale_price: {
-      type: Sequelize.DECIMAL
-    },
-
   });
-  PIOS.belongsTo(PIOS,{ foreignKey: "Id_price_list"});
   return PIOS ;     
 };

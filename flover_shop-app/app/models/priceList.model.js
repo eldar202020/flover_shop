@@ -8,6 +8,5 @@ module.exports = (sequelize, Sequelize) => {
     },
     
   });
-  priceList.belongsTo(priceList,{ foreignKey: "$(id -g)"});
   return priceList ;
 };

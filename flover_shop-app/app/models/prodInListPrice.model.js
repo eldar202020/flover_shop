@@ -1,5 +1,5 @@
 module.exports = (sequelize, Sequelize)=>{
-    const prodInListPrice = sequelize.define("Product_in_the_price_list",{
+    const prodInListPrice = sequelize.define("ProductInPriceList",{
         Id_product:{
             type: Sequelize.INTEGER
         },
@@ -8,6 +8,5 @@ module.exports = (sequelize, Sequelize)=>{
         }
 
     });
-    prodInListPrice.belongsTo(prodInListPrice,{ foreignKey: "Id_product"});
   return prodInListPrice ;
 };

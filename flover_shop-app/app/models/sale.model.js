@@ -14,6 +14,5 @@ module.exports = (sequelize, Sequelize) => {
     }  
 
   });
-  Sale.belongsTo(Sale,{ foreignKey: "Id_price_list"});
   return Sale ;     
 };

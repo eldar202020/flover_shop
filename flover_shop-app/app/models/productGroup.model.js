@@ -1,5 +1,5 @@
 module.exports = (sequelize, Sequelize) => {
-  const GoodsGroup = sequelize.define("goodsgroup", {
+  const productGroup = sequelize.define("produt_group", {
     name: {
       type: Sequelize.STRING
     },
@@ -10,6 +10,5 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.INTEGER
     }
   });
-  GoodsGroup.belongsTo(GoodsGroup,{ foreignKey: "baseGoodsGroup"});
-  return GoodsGroup ;
+  return productGroup ;
 };
