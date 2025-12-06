@@ -19,7 +19,7 @@ db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
 db.product = require("./product.model.js")(sequelize, Sequelize);
-db.goodsGroup = require("./productGroup.model.js")(sequelize, Sequelize);
+db.productGroup = require("./productGroup.model.js")(sequelize, Sequelize);
 db.sale = require("./sale.model.js")(sequelize, Sequelize);
 db.priceList = require("./priceList.model.js")(sequelize, Sequelize);
 db.prodIsOnSale = require("./prodIsOnSale.model.js")(sequelize, Sequelize);
