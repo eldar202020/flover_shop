@@ -30,6 +30,10 @@ const PORT = process.env.NODE_DOCKER_PORT || 8081;
 //routers
 require("./app/routes/productgroup.routes")(app);
 require("./app/routes/product.routes")(app);
+require("./app/routes/sale.routes")(app);
+require("./app/routes/pricelist.routes")(app);
+require("./app/routes/prodinlistprice.routes")(app);
+require("./app/routes/prodisOnSale.routes")(app);
 
 app.listen(PORT, () => {
 console.log(`Server is running on port ${PORT}.`);
