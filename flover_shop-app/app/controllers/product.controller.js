@@ -1,6 +1,6 @@
 const { where } = require("sequelize");
 const db = require("../models");
-const ProductGroup = db.productGroup;
+const Product = db.product;
 const Op = db.Sequelize.Op;
 
 exports.create = (req, res) => {
@@ -10,19 +10,24 @@ exports.create = (req, res) => {
     });
     return;
   }
-  const pG = {
+  const Prod = {
     name: req.body.name,
     description: req.body.description,
-    baseGoodsGroup: req.body.baseGoodsGroup,
+    article: req.body.article,
+    author: req.body.author,
+    product_type: req.body.product_type,
+    publisher: req.body.publisher,
+    isbn: req.body.isbn
+    
   };
-  ProductGroup.create(pG)
+  Product.create(Prod)
     .then(data => {
       res.send(data);
     })
     .catch(err => {
       res.status(500).send({
         message:
-          err.message || "Some error occurred whil creating ProductGroup",
+          err.message || "Some error occurred whil creating Product",
       });
     });
 };
@@ -30,7 +35,7 @@ exports.create = (req, res) => {
 exports.findAll = (req, res) => {
   const name = req.query.name;
   var condition = name ? { name: { [Op.iLike]: `%${name}%` } } : null;
-  ProductGroup.findAll({ where: condition })
+  Product.findAll({ where: condition })
     .then(data => {
       res.send(data);
     })
@@ -43,13 +48,13 @@ exports.findAll = (req, res) => {
 
 exports.findOne = (req, res) => {
   const id = req.params.id;
-  ProductGroup.findByPk(id)
+  Product.findByPk(id)
   .then(data => {
     if (data) {
       res.send(data);
     } else {
       res.status(404).send({
-        message: `canon find ProductGroup with id=${id}.`,
+        message: `canon find Product with id=${id}.`,
       });
     }
   })
@@ -63,65 +68,65 @@ exports.findOne = (req, res) => {
 
 exports.update = (req, res) =>{
   const id = req.params.id;
-  ProductGroup.update(req.body, {
+  Product.update(req.body, {
     where: {id: id}
   })
   .then(nam =>{
     if (nam == 1){
       res.send({
-        message: "ProductGroup was this.updatesuccessfully"
+        message: "Product was this.updatesuccessfully"
       });
     }else {
       res.send({
-        message: `cannot update ProductGroup with id = ${id}. 
-        Maybe ProductGroup was not found or req.body is empty!`
+        message: `cannot update Product with id = ${id}. 
+        Maybe Product was not found or req.body is empty!`
       });
     }
   })
   .catch(err => {
     res.status(500).send({
-      message:"Error updating ProductGroup with id "+ id
+      message:"Error updating Product with id "+ id
     });
   });
 };
 
 exports.delete = (req, res) => {
   const id = req.params.id;
-  ProductGroup.destroy({
+  Product.destroy({
     where: {id: id}
   })
   .then(nam =>{
     if (num == 1){
       res.send({
-        messege: "ProductGroups was deleted successfully!"
+        messege: "Products was deleted successfully!"
       });
     }else {
       res.send({
-        message: `cannot delete ProductGroup with id = ${id}. 
-        Maybe ProductGroup was not found`
+        message: `cannot delete Product with id = ${id}. 
+        Maybe Product was not found`
       })
     }
   })
   .catch(err => {
      res.status(500).send({
-      message:"Could not delete ProductGroup with id "+ id
+      message:"Could not delete Product with id "+ id
     });
   })
 };
 
 exports.deleteAll = (req, res) => {
-  ProductGroup.destroy({
+  Product.destroy({
     where:{},
     truncate: false
   })
     .then(nams => {
       res.send({
-        message: `${nams} ProductGroup were deleted successfully! `
+        message: `${nams} Product were deleted successfully! `
       });
     })
     .catch(err => {
       res.status(500).send({
-        message: err.message || "Some error occurred whil creating ProductGroup",
+        message: err.message || "Some error occurred whil creating Product",
       });
     });
 };

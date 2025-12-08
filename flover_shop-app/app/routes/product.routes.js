@@ -1,5 +1,5 @@
 module.exports = app =>{
-    const productgroup = require("../controllers/productGroup.controller.js");
+    const productgroup = require("../controllers/product.controller.js");
     
     var router = require("express").Router();
 
@@ -10,6 +10,6 @@ module.exports = app =>{
     router.delete("/:id", productgroup.delete);
     router.delete("/", productgroup.deleteAll);
 
-    app.use("/api/productgroups", router);//бызовый url модели ProductGroup
+    app.use("/api/product", router);//бызовый url модели ProductGroup
     console.log('router for /api/productgroups initialized')
 }

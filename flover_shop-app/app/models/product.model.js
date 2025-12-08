@@ -23,9 +23,6 @@ module.exports = (sequelize, Sequelize) => {
     },
     isbn:{
         type: Sequelize.STRING
-    },
-    description:{
-        type: Sequelize.STRING
     }
 
   });
