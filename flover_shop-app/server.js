@@ -12,7 +12,7 @@ db.sequelize.sync()
  console.log("Failed to sync db: " + err.message);
 });
 var corsOptions = {
- origin: "http://localhost:8081"
+ origin: "*"
 };
 app.use(cors(corsOptions));
 // parse requests of content-type - application/json
@@ -21,10 +21,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 // simple route
 app.get("/", (req, res) => {
- res.json({ message: "Welcome to trade-app application." });
+ res.json({ message: "Welcome to flover-shop" });
 });
+
 // set port, listen for requests
-const PORT = process.env.NODE_DOCKER_PORT || 8080;
+const PORT = process.env.NODE_DOCKER_PORT || 8081;
+
+//routers
+require("./app/routes/productgroup.routes")(app);
+
 app.listen(PORT, () => {
 console.log(`Server is running on port ${PORT}.`);
 });

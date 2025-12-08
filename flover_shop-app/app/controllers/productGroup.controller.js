@@ -1,29 +1,29 @@
 const db = require("../models");
 const ProductGroup = db.productGroup;
-const Op = db.sequelize.Op;
+const Op = db.Sequelize.Op;
 
 exports.create = (req, res) => {
   if (!req.body.title) {
     res.status(400).send({
-      message: "Connect can not be empty",
+      message: "Connect can not be empty"
     });
     return;
   }
 
-  const productGroup = {
+  const pG = {
     name: req.body.title,
     description: req.body.description,
-    baseGoodsGroup: req.body.baseGoodsGroup,
+    baseGoodsGroup: req.body.baseGoodsGroup
   };
 
-  ProductGroup.create(productGroup)
-    .then((data) => {
+  ProductGroup.create(pG)
+    .then(data => {
       res.send(data);
     })
-    .catch((err) => {
+    .catch(err => {
       res.status(500).send({
-        message:
-          err.message || "Some error occurred whil creating ProductGroup",
+        message: err.message || "Some error occurred whil creating ProductGroup"
       });
     });
 };
+

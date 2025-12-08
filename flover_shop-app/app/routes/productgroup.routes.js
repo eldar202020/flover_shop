@@ -1,14 +1,15 @@
 module.exports = app =>{
-    const productgroup = require("../controllers/productGroup.controller.js")
-    var router = require('express').Router();
+    const productgroup = require("../controllers/productGroup.controller.js");
     
-    //roures
-    router.post("/", productgroup.create);
-    router.get("/", productgroup.findAll);
-    router.get("/:id", productgroup.findOne);
-    router.put("/:id", productgroup.updete);
-    router.delete("/:id", productgroup.delete);
-    router.delete("/:id", productgroup.deleteAll);
+    var router = require("express").Router();
 
-    app.use("/api/goodsgroups", router);//бызовый url модели ProductGroup
+    router.post("/", productgroup.create);
+    //router.get("/", productgroup.findAll);
+    //router.get("/:id", productgroup.findOne);
+    //router.put("/:id", productgroup.update);
+    //router.delete("/:id", productgroup.delete);
+    //router.delete("/", productgroup.deleteAll);
+
+    app.use("/api/productgroups", router);//бызовый url модели ProductGroup
+    console.log('router for /api/productgroups initialized')
 }
