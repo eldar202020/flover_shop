@@ -4,15 +4,15 @@ const ProdIsOnSale = db.sale;
 const Op = db.Sequelize.Op;
 
 exports.create = (req, res) => {
-  if (!req.body.name) {
+  if (!req.body.quanity) {
     res.status(400).send({
       message: "Connect can not be empty",
     });
     return;
   }
   const prodIsOnSale = {
-    Id_product: req.body.Id_product,
-    Id_sale: req.body. Id_sale,
+    id_product: req.body.Id_product,
+    id_sale: req.body. Id_sale,
     quanity: req.body.quanity
   };
   ProdIsOnSale.create(prodIsOnSale)

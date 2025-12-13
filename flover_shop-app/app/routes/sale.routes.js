@@ -9,6 +9,7 @@ module.exports = app =>{
     router.put("/:id", productgroup.update);
     router.delete("/:id", productgroup.delete);
     router.delete("/", productgroup.deleteAll);
+    router.get("/:id/saleWithProducts", productgroup.saleWithProducts);
 
     app.use("/api/sale", router);//бызовый url модели ProductGroup
     console.log('router for /api/sale initialized')

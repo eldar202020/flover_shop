@@ -1,20 +1,19 @@
-const { where } = require("sequelize");
+const { where, QueryTypes } = require("sequelize");
 const db = require("../models");
 const Sale = db.sale;
 const Op = db.Sequelize.Op;
 
 exports.create = (req, res) => {
-  if (!req.body.name) {
+  if (!req.body.sale_date) {
     res.status(400).send({
       message: "Connect can not be empty",
     });
     return;
   }
   const sale = {
-    Id_price_list: req.body.Id_price_list,
+    id_price_list: req.body.id_price_list,
     sale_date: req.body.sale_date,
-    Payment_time: req.body.Payment_time,
-    Total_amount: req.body.Total_amount
+    total_amount: req.body.total_amount
   };
   Sale.create(sale)
     .then(data => {
@@ -123,6 +122,22 @@ exports.deleteAll = (req, res) => {
     .catch(err => {
       res.status(500).send({
         message: err.message || "Some error occurred whil creating Sale",
+      });
+    });
+};
+
+exports.saleWithProducts = (req, res) => {
+  const id = req.params.id;
+  db.sequelize.query(`SELECT s.*, p.name as product_name, pis.quanity FROM sales s 
+   JOIN prod_is_on_sales pis ON s.id = pis.id_sale  JOIN products p ON pis.id_product = p.id WHERE s.id = ${id}`, {
+    type: QueryTypes.SELECT,
+  })
+    .then(data => {
+      res.send(data);
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: err.message || "Ошибка при получении данных продажи",
       });
     });
 };
