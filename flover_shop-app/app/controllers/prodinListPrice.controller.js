@@ -139,3 +139,18 @@ exports.ProdandPrice = (req, res) => {
       });
     });
 };
+
+exports.priceDATA = (req, res) => {
+  const id = req.params.id;
+  db.sequelize.query(`SELECT pl.effective_date, pilp.price FROM product_in_list_prices pilp JOIN price_lists pl  ON pl.id = pilp.id WHERE pl.id = ${id}`,{
+    type: QueryTypes.SELECT,
+  })
+    .then(data => {
+      res.send(data);
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: err.message || "Ошибка",
+      });
+    });
+};

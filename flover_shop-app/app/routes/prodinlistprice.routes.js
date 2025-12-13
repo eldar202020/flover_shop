@@ -10,6 +10,7 @@ module.exports = app =>{
     router.delete("/:id", pilp.delete);
     router.delete("/", pilp.deleteAll);
     router.get("/:id/ProdandPrice", pilp.ProdandPrice);
+    router.get("/:id/Pricedata", pilp.priceDATA);
 
     app.use("/api/prodinListPrice", router);//бызовый url модели ProductGroup
     console.log('router for /api/prodinListPrice initialized')
