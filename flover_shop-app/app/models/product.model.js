@@ -10,18 +10,9 @@ module.exports = (sequelize, Sequelize) => {
       type: Sequelize.BOOLEAN
     },
     id_category: {
-      type: Sequelize.BOOLEAN
+      type: Sequelize.INTEGER
     },
-    author: {
-      type: Sequelize.STRING
-    },
-    product_type:{
-        type: Sequelize.STRING
-    },
-    publisher:{
-        type: Sequelize.STRING
-    },
-    isbn:{
+    provider:{
         type: Sequelize.STRING
     }
 

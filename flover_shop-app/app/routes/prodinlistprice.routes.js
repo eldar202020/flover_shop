@@ -1,14 +1,15 @@
 module.exports = app =>{
-    const productgroup = require("../controllers/prodinListPrice.controller.js");
+    const pilp = require("../controllers/prodinListPrice.controller.js");
     
     var router = require("express").Router();
 
-    router.post("/", productgroup.create);
-    router.get("/", productgroup.findAll);
-    router.get("/:id", productgroup.findOne);
-    router.put("/:id", productgroup.update);
-    router.delete("/:id", productgroup.delete);
-    router.delete("/", productgroup.deleteAll);
+    router.post("/", pilp.create);
+    router.get("/", pilp.findAll);
+    router.get("/:id", pilp.findOne);
+    router.put("/:id", pilp.update);
+    router.delete("/:id", pilp.delete);
+    router.delete("/", pilp.deleteAll);
+    router.get("/:id/ProdandPrice", pilp.ProdandPrice);
 
     app.use("/api/prodinListPrice", router);//бызовый url модели ProductGroup
     console.log('router for /api/prodinListPrice initialized')

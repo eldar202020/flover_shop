@@ -1,3 +1,4 @@
+const { underscoredIf } = require("sequelize/lib/utils");
 const dbConfig = require("../config/db.config.js");
 const Sequelize = require("sequelize");
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
@@ -5,6 +6,10 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   dialect: dbConfig.dialect,
   port: dbConfig.port,
   operatorsAliases: false,
+  
+  defaine:{
+    underscored: true,
+  },
 
   pool: {
     max: dbConfig.pool.max,

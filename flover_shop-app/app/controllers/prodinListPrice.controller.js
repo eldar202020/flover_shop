@@ -1,20 +1,20 @@
-const { where } = require("sequelize");
+const { where, QueryTypes } = require("sequelize");
 const db = require("../models");
 const ProdInListPrice = db.prodInListPrice;
 const Op = db.Sequelize.Op;
 
 exports.create = (req, res) => {
-  if (!req.body.name) {
+  if (!req.body.id_product) {
     res.status(400).send({
       message: "Connect can not be empty",
     });
     return;
   }
-  const prodInListPrice = {
-    Id_product: req.body.Id_product,
-    Price: req.body.Price
+  const prodinListPrice = {
+    id_product: req.body.id_product,
+    price: req.body.price
   };
-  ProdInListPrice.create(prodInListPrice)
+  ProdInListPrice.create(prodinListPrice)
     .then(data => {
       res.send(data);
     })
@@ -121,6 +121,21 @@ exports.deleteAll = (req, res) => {
     .catch(err => {
       res.status(500).send({
         message: err.message || "Some error occurred whil creating ProdInListPrice",
+      });
+    });
+};
+
+exports.ProdandPrice = (req, res) => {
+  const id = req.params.id;
+  db.sequelize.query(`SELECT p.name, pilp.price FROM product_in_list_prices pilp JOIN products p  ON p.id = pilp.id_product WHERE p.id = ${id}`,{
+    type: QueryTypes.SELECT,
+  })
+    .then(data => {
+      res.send(data);
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: err.message || "Ошибка",
       });
     });
 };

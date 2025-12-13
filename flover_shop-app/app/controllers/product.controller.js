@@ -1,4 +1,4 @@
-const { where } = require("sequelize");
+const { where, QueryTypes } = require("sequelize");
 const db = require("../models");
 const Product = db.product;
 const Op = db.Sequelize.Op;
@@ -14,10 +14,8 @@ exports.create = (req, res) => {
     name: req.body.name,
     description: req.body.description,
     article: req.body.article,
-    author: req.body.author,
-    product_type: req.body.product_type,
-    publisher: req.body.publisher,
-    isbn: req.body.isbn
+    id_category: req.body.id_category,
+    provider: req.body.provider,
     
   };
   Product.create(Prod)
@@ -129,4 +127,22 @@ exports.deleteAll = (req, res) => {
         message: err.message || "Some error occurred whil creating Product",
       });
     });
+};
+
+exports.getProductGroup = (req, res) =>{
+  const id = req.params.id;
+  db.sequelize.query('SELECT pg.* FROM produt_groups pg LEFT JOIN products p ON pg.id = p.id_category WHERE p.id = :id',{
+    model: Product,
+    mapToModels: true,
+    replacements:{id: id},
+    type: QueryTypes.SELECT,
+  })
+  .then(result => {
+    res.send (result[0]);
+  })
+  .catch(err => {
+    res.status(500).send({
+      message: err.message || "Some error occured while productgrup"
+    });
+  });
 };

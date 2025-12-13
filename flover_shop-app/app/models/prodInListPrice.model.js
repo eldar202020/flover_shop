@@ -1,9 +1,9 @@
 module.exports = (sequelize, Sequelize)=>{
-    const prodInListPrice = sequelize.define("ProductInPriceList",{
-        Id_product:{
+    const prodInListPrice = sequelize.define("product_in_list_price",{
+        id_product:{
             type: Sequelize.INTEGER
         },
-        Price:{
+        price:{
             type: Sequelize.DECIMAL
         }
 
