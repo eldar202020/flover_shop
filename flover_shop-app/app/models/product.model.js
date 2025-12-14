@@ -6,9 +6,6 @@ module.exports = (sequelize, Sequelize) => {
     description: {
       type: Sequelize.STRING
     },
-    article: {
-      type: Sequelize.BOOLEAN
-    },
     id_category: {
       type: Sequelize.INTEGER
     },

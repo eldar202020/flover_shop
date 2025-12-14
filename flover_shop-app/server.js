@@ -2,6 +2,10 @@ require("dotenv").config();
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+
+const swaggerJSDoc = require("swagger-jsdoc");
+const swaggerUi = require("swagger-ui-express");
+
 const app = express();
 const db = require("./app/models");
 db.sequelize.sync()
@@ -26,6 +30,44 @@ app.get("/", (req, res) => {
 
 // set port, listen for requests
 const PORT = process.env.NODE_DOCKER_PORT || 8081;
+
+// Swagger конфигурация
+const swaggerOptions = {
+  definition: {
+    openapi: "3.0.0",
+    info: {
+      title: "Flower Shop API",
+      version: "1.0.0",
+      description: "API для магазина цветов",
+    },
+    servers: [
+      {
+        url: `http://localhost:${PORT}`,
+        description: "Development server",
+      },
+    ],
+    components: {
+      schemas: {}, // ОБЯЗАТЕЛЬНО! Пустой объект, который заполнится из аннотаций
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
+  },
+  apis: ["./app/routes/*.js"], // Путь к файлам с аннотациями
+};
+const swaggerSpec = swaggerJSDoc(swaggerOptions);
+
+// Swagger UI
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 //routers
 require("./app/routes/productgroup.routes")(app);
