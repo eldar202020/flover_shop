@@ -3,16 +3,18 @@ module.exports = (sequelize, Sequelize) => {
     id_price_list: {
       type: Sequelize.INTEGER
     },
+    id_customer: {
+      type: Sequelize.INTEGER
+    },
     sale_date: {
       type: Sequelize.DATE
     },
     payment_time: {
       type: Sequelize.TIME
     },
-    total_amount:{
-        type: Sequelize.DECIMAL
-    }  
-
+    total_amount: {
+      type: Sequelize.DECIMAL
+    }
   });
-  return Sale ;     
+  return Sale;
 };

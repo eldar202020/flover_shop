@@ -1,4 +1,3 @@
-const { underscoredIf } = require("sequelize/lib/utils");
 const dbConfig = require("../config/db.config.js");
 const Sequelize = require("sequelize");
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
@@ -6,11 +5,9 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   dialect: dbConfig.dialect,
   port: dbConfig.port,
   operatorsAliases: false,
-  
-  defaine:{
+  define: {
     underscored: true,
   },
-
   pool: {
     max: dbConfig.pool.max,
     min: dbConfig.pool.min,
@@ -29,7 +26,10 @@ db.sale = require("./sale.model.js")(sequelize, Sequelize);
 db.priceList = require("./priceList.model.js")(sequelize, Sequelize);
 db.prodIsOnSale = require("./prodIsOnSale.model.js")(sequelize, Sequelize);
 db.prodInListPrice = require("./prodInListPrice.model.js")(sequelize, Sequelize);
+db.customer = require("./customer.model.js")(sequelize, Sequelize);
+db.provider = require("./provider.model.js")(sequelize, Sequelize);
+db.shipment = require("./shipment.model.js")(sequelize, Sequelize);
 
-require("./references.model.js")(db)
+require("./references.model.js")(db);
 
 module.exports = db;

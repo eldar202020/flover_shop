@@ -1,14 +1,14 @@
 module.exports = (sequelize, Sequelize) => {
-  const ProdIsOnSale = sequelize.define("prod_is_on_sale", {
-    id_product: {
+  const Shipment = sequelize.define("shipment", {
+    product_id: {
       type: Sequelize.INTEGER
     },
-    id_sale: {
+    provider_id: {
       type: Sequelize.INTEGER
     },
-    quantity: {
+    count: {
       type: Sequelize.INTEGER
     }
   });
-  return ProdIsOnSale;
+  return Shipment;
 };

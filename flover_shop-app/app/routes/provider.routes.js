@@ -1,61 +1,58 @@
 module.exports = app => {
-  const priceList = require("../controllers/priceList.controller.js");
+  const provider = require("../controllers/provider.controller.js");
   var router = require("express").Router();
 
   /**
    * @swagger
    * components:
    *   schemas:
-   *     PriceList:
+   *     Provider:
    *       type: object
    *       required:
-   *         - name
+   *         - organization_name
    *       properties:
    *         id:
    *           type: integer
-   *         name:
+   *         organization_name:
    *           type: string
-   *         effective_date:
-   *           type: string
-   *           format: date-time
    */
 
   /**
    * @swagger
-   * /api/pricelist:
+   * /api/provider:
    *   post:
-   *     summary: Create price list
-   *     tags: [PriceLists]
+   *     summary: Create provider
+   *     tags: [Providers]
    *     requestBody:
    *       required: true
    *       content:
    *         application/json:
    *           schema:
-   *             $ref: '#/components/schemas/PriceList'
+   *             $ref: '#/components/schemas/Provider'
    *     responses:
    *       200:
-   *         description: Price list created
+   *         description: Provider created
    */
-  router.post("/", priceList.create);
+  router.post("/", provider.create);
 
   /**
    * @swagger
-   * /api/pricelist:
+   * /api/provider:
    *   get:
-   *     summary: Get all price lists
-   *     tags: [PriceLists]
+   *     summary: Get all providers
+   *     tags: [Providers]
    *     responses:
    *       200:
-   *         description: List of price lists
+   *         description: List of providers
    */
-  router.get("/", priceList.findAll);
+  router.get("/", provider.findAll);
 
   /**
    * @swagger
-   * /api/pricelist/{id}:
+   * /api/provider/{id}:
    *   get:
-   *     summary: Get price list by ID
-   *     tags: [PriceLists]
+   *     summary: Get provider by ID
+   *     tags: [Providers]
    *     parameters:
    *       - in: path
    *         name: id
@@ -64,16 +61,16 @@ module.exports = app => {
    *           type: integer
    *     responses:
    *       200:
-   *         description: Price list found
+   *         description: Provider found
    */
-  router.get("/:id", priceList.findOne);
+  router.get("/:id", provider.findOne);
 
   /**
    * @swagger
-   * /api/pricelist/{id}:
+   * /api/provider/{id}:
    *   put:
-   *     summary: Update price list
-   *     tags: [PriceLists]
+   *     summary: Update provider
+   *     tags: [Providers]
    *     parameters:
    *       - in: path
    *         name: id
@@ -85,19 +82,19 @@ module.exports = app => {
    *       content:
    *         application/json:
    *           schema:
-   *             $ref: '#/components/schemas/PriceList'
+   *             $ref: '#/components/schemas/Provider'
    *     responses:
    *       200:
-   *         description: Price list updated
+   *         description: Provider updated
    */
-  router.put("/:id", priceList.update);
+  router.put("/:id", provider.update);
 
   /**
    * @swagger
-   * /api/pricelist/{id}:
+   * /api/provider/{id}:
    *   delete:
-   *     summary: Delete price list
-   *     tags: [PriceLists]
+   *     summary: Delete provider
+   *     tags: [Providers]
    *     parameters:
    *       - in: path
    *         name: id
@@ -106,9 +103,9 @@ module.exports = app => {
    *           type: integer
    *     responses:
    *       200:
-   *         description: Price list deleted
+   *         description: Provider deleted
    */
-  router.delete("/:id", priceList.delete);
+  router.delete("/:id", provider.delete);
 
-  app.use("/api/pricelist", router);
+  app.use("/api/provider", router);
 };

@@ -1,60 +1,60 @@
 module.exports = app => {
-  const controller = require("../controllers/prodIsOnSale.controller.js");
+  const shipment = require("../controllers/shipment.controller.js");
   var router = require("express").Router();
 
   /**
    * @swagger
    * components:
    *   schemas:
-   *     ProdIsOnSale:
+   *     Shipment:
    *       type: object
    *       properties:
    *         id:
    *           type: integer
-   *         id_product:
+   *         product_id:
    *           type: integer
-   *         id_sale:
+   *         provider_id:
    *           type: integer
-   *         quantity:
+   *         count:
    *           type: integer
    */
 
   /**
    * @swagger
-   * /api/prodisonsale:
+   * /api/shipment:
    *   post:
-   *     summary: Create product-sale entry
-   *     tags: [ProdIsOnSale]
+   *     summary: Create shipment
+   *     tags: [Shipments]
    *     requestBody:
    *       required: true
    *       content:
    *         application/json:
    *           schema:
-   *             $ref: '#/components/schemas/ProdIsOnSale'
+   *             $ref: '#/components/schemas/Shipment'
    *     responses:
    *       200:
-   *         description: Entry created
+   *         description: Shipment created
    */
-  router.post("/", controller.create);
+  router.post("/", shipment.create);
 
   /**
    * @swagger
-   * /api/prodisonsale:
+   * /api/shipment:
    *   get:
-   *     summary: Get all entries
-   *     tags: [ProdIsOnSale]
+   *     summary: Get all shipments
+   *     tags: [Shipments]
    *     responses:
    *       200:
-   *         description: List of entries
+   *         description: List of shipments
    */
-  router.get("/", controller.findAll);
+  router.get("/", shipment.findAll);
 
   /**
    * @swagger
-   * /api/prodisonsale/{id}:
+   * /api/shipment/{id}:
    *   get:
-   *     summary: Get entry by ID
-   *     tags: [ProdIsOnSale]
+   *     summary: Get shipment by ID
+   *     tags: [Shipments]
    *     parameters:
    *       - in: path
    *         name: id
@@ -63,16 +63,16 @@ module.exports = app => {
    *           type: integer
    *     responses:
    *       200:
-   *         description: Entry found
+   *         description: Shipment found
    */
-  router.get("/:id", controller.findOne);
+  router.get("/:id", shipment.findOne);
 
   /**
    * @swagger
-   * /api/prodisonsale/{id}:
+   * /api/shipment/{id}:
    *   put:
-   *     summary: Update entry
-   *     tags: [ProdIsOnSale]
+   *     summary: Update shipment
+   *     tags: [Shipments]
    *     parameters:
    *       - in: path
    *         name: id
@@ -84,19 +84,19 @@ module.exports = app => {
    *       content:
    *         application/json:
    *           schema:
-   *             $ref: '#/components/schemas/ProdIsOnSale'
+   *             $ref: '#/components/schemas/Shipment'
    *     responses:
    *       200:
-   *         description: Entry updated
+   *         description: Shipment updated
    */
-  router.put("/:id", controller.update);
+  router.put("/:id", shipment.update);
 
   /**
    * @swagger
-   * /api/prodisonsale/{id}:
+   * /api/shipment/{id}:
    *   delete:
-   *     summary: Delete entry
-   *     tags: [ProdIsOnSale]
+   *     summary: Delete shipment
+   *     tags: [Shipments]
    *     parameters:
    *       - in: path
    *         name: id
@@ -105,9 +105,9 @@ module.exports = app => {
    *           type: integer
    *     responses:
    *       200:
-   *         description: Entry deleted
+   *         description: Shipment deleted
    */
-  router.delete("/:id", controller.delete);
+  router.delete("/:id", shipment.delete);
 
-  app.use("/api/prodisonsale", router);
+  app.use("/api/shipment", router);
 };

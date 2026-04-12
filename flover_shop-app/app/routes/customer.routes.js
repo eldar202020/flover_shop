@@ -1,12 +1,12 @@
 module.exports = app => {
-  const priceList = require("../controllers/priceList.controller.js");
+  const customer = require("../controllers/customer.controller.js");
   var router = require("express").Router();
 
   /**
    * @swagger
    * components:
    *   schemas:
-   *     PriceList:
+   *     Customer:
    *       type: object
    *       required:
    *         - name
@@ -15,47 +15,50 @@ module.exports = app => {
    *           type: integer
    *         name:
    *           type: string
-   *         effective_date:
+   *         phone:
    *           type: string
-   *           format: date-time
+   *         personal_purchases:
+   *           type: integer
+   *         personal_discount:
+   *           type: number
    */
 
   /**
    * @swagger
-   * /api/pricelist:
+   * /api/customer:
    *   post:
-   *     summary: Create price list
-   *     tags: [PriceLists]
+   *     summary: Create a new customer
+   *     tags: [Customers]
    *     requestBody:
    *       required: true
    *       content:
    *         application/json:
    *           schema:
-   *             $ref: '#/components/schemas/PriceList'
+   *             $ref: '#/components/schemas/Customer'
    *     responses:
    *       200:
-   *         description: Price list created
+   *         description: Customer created
    */
-  router.post("/", priceList.create);
+  router.post("/", customer.create);
 
   /**
    * @swagger
-   * /api/pricelist:
+   * /api/customer:
    *   get:
-   *     summary: Get all price lists
-   *     tags: [PriceLists]
+   *     summary: Get all customers
+   *     tags: [Customers]
    *     responses:
    *       200:
-   *         description: List of price lists
+   *         description: List of customers
    */
-  router.get("/", priceList.findAll);
+  router.get("/", customer.findAll);
 
   /**
    * @swagger
-   * /api/pricelist/{id}:
+   * /api/customer/{id}:
    *   get:
-   *     summary: Get price list by ID
-   *     tags: [PriceLists]
+   *     summary: Get customer by ID
+   *     tags: [Customers]
    *     parameters:
    *       - in: path
    *         name: id
@@ -64,16 +67,16 @@ module.exports = app => {
    *           type: integer
    *     responses:
    *       200:
-   *         description: Price list found
+   *         description: Customer found
    */
-  router.get("/:id", priceList.findOne);
+  router.get("/:id", customer.findOne);
 
   /**
    * @swagger
-   * /api/pricelist/{id}:
+   * /api/customer/{id}:
    *   put:
-   *     summary: Update price list
-   *     tags: [PriceLists]
+   *     summary: Update customer
+   *     tags: [Customers]
    *     parameters:
    *       - in: path
    *         name: id
@@ -85,19 +88,19 @@ module.exports = app => {
    *       content:
    *         application/json:
    *           schema:
-   *             $ref: '#/components/schemas/PriceList'
+   *             $ref: '#/components/schemas/Customer'
    *     responses:
    *       200:
-   *         description: Price list updated
+   *         description: Customer updated
    */
-  router.put("/:id", priceList.update);
+  router.put("/:id", customer.update);
 
   /**
    * @swagger
-   * /api/pricelist/{id}:
+   * /api/customer/{id}:
    *   delete:
-   *     summary: Delete price list
-   *     tags: [PriceLists]
+   *     summary: Delete customer
+   *     tags: [Customers]
    *     parameters:
    *       - in: path
    *         name: id
@@ -106,9 +109,9 @@ module.exports = app => {
    *           type: integer
    *     responses:
    *       200:
-   *         description: Price list deleted
+   *         description: Customer deleted
    */
-  router.delete("/:id", priceList.delete);
+  router.delete("/:id", customer.delete);
 
-  app.use("/api/pricelist", router);
+  app.use("/api/customer", router);
 };

@@ -1,17 +1,17 @@
 module.exports = (sequelize, Sequelize) => {
-  const Product = sequelize.define("product", {
+  const Customer = sequelize.define("customer", {
     name: {
       type: Sequelize.STRING
     },
-    description: {
+    phone: {
       type: Sequelize.STRING
     },
-    id_category: {
+    personal_purchases: {
       type: Sequelize.INTEGER
     },
-    quantity: {
-      type: Sequelize.INTEGER
+    personal_discount: {
+      type: Sequelize.DECIMAL
     }
   });
-  return Product;
+  return Customer;
 };
