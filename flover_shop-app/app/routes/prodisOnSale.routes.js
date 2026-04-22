@@ -49,6 +49,9 @@ module.exports = app => {
    */
   router.get("/", controller.findAll);
 
+  // Получить позиции конкретной продажи (ДОЛЖЕН быть до /:id)
+  router.get("/sale/:saleId", controller.findBySaleId);
+
   /**
    * @swagger
    * /api/prodisonsale/{id}:

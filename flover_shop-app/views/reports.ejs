@@ -1,0 +1,524 @@
+<%- include('partials/head') %>
+<%- include('partials/sidebar') %>
+
+<div class="main-content d-flex flex-column">
+  <%- include('partials/navbar') %>
+
+  <div class="container-fluid p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+      <div>
+        <h2 class="mb-1 text-gradient fw-bold">Отчёты и аналитика</h2>
+        <p class="text-muted mb-0">Агрегированные данные с фильтрами</p>
+      </div>
+    </div>
+
+    <!-- Вкладки отчётов -->
+    <ul class="nav nav-pills mb-4 gap-2" id="reportTabs" role="tablist">
+      <li class="nav-item">
+        <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#tab-revenue" type="button">
+          <i class="bi bi-graph-up me-2"></i>Выручка по периоду
+        </button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-products" type="button">
+          <i class="bi bi-box me-2"></i>Топ товаров
+        </button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-customers" type="button">
+          <i class="bi bi-people me-2"></i>Отчёт по клиентам
+        </button>
+      </li>
+      <% if (currentUser && (currentUser.role === 'admin' || currentUser.role === 'manager')) { %>
+      <li class="nav-item">
+        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-shipments" type="button">
+          <i class="bi bi-truck me-2"></i>Поставки по поставщикам
+        </button>
+      </li>
+      <% } %>
+      <% if (currentUser && currentUser.role === 'admin') { %>
+      <li class="nav-item">
+        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-profit" type="button">
+          <i class="bi bi-cash-coin me-2"></i>Прибыль по месяцам
+        </button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" data-bs-toggle="pill" data-bs-target="#tab-abc" type="button">
+          <i class="bi bi-bar-chart me-2"></i>ABC-анализ
+        </button>
+      </li>
+      <% } %>
+    </ul>
+
+    <div class="tab-content">
+
+      <!-- ─── ОТЧЁТ 1: Выручка по периоду ─── -->
+      <div class="tab-pane fade show active" id="tab-revenue">
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+          <h5 class="fw-bold mb-3"><i class="bi bi-funnel me-2 text-primary"></i>Фильтры</h5>
+          <form class="row g-3" id="revenueFilterForm">
+            <div class="col-md-3">
+              <label class="form-label small fw-bold">Дата с</label>
+              <input type="date" class="form-control" id="rev_date_from" name="date_from">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label small fw-bold">Дата по</label>
+              <input type="date" class="form-control" id="rev_date_to" name="date_to">
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+              <button type="button" class="btn btn-primary w-100" onclick="loadRevenueReport()">
+                <i class="bi bi-search me-2"></i>Сформировать
+              </button>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+              <button type="button" class="btn btn-outline-secondary w-100" onclick="resetRevenue()">
+                Сбросить
+              </button>
+            </div>
+          </form>
+        </div>
+        <!-- Итого -->
+        <div class="row g-3 mb-4" id="revSummary"></div>
+        <!-- Таблица -->
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-bold mb-0">Детализация по дням</h5>
+            <span class="badge bg-primary-subtle text-primary" id="revRowCount">0 записей</span>
+          </div>
+          <div class="table-responsive">
+            <table class="table align-middle" id="revenueTable">
+              <thead><tr>
+                <th>Дата</th>
+                <th>Кол-во продаж</th>
+                <th class="text-end">Выручка</th>
+                <th class="text-end">Средний чек</th>
+              </tr></thead>
+              <tbody id="revenueBody">
+                <tr><td colspan="4" class="text-center text-muted py-5">Выберите период и нажмите «Сформировать»</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── ОТЧЁТ 2: Топ товаров ─── -->
+      <div class="tab-pane fade" id="tab-products">
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+          <h5 class="fw-bold mb-3"><i class="bi bi-funnel me-2 text-primary"></i>Фильтры</h5>
+          <form class="row g-3" id="productsFilterForm">
+            <div class="col-md-3">
+              <label class="form-label small fw-bold">Категория</label>
+              <select class="form-select" id="prod_category">
+                <option value="">Все категории</option>
+                <% (groups || []).forEach(g => { %>
+                  <option value="<%= g.id %>"><%= g.name %></option>
+                <% }) %>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label small fw-bold">Дата с</label>
+              <input type="date" class="form-control" id="prod_date_from">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label small fw-bold">Дата по</label>
+              <input type="date" class="form-control" id="prod_date_to">
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+              <button type="button" class="btn btn-primary w-100" onclick="loadTopProducts()">
+                <i class="bi bi-search me-2"></i>Сформировать
+              </button>
+            </div>
+          </form>
+        </div>
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+          <h5 class="fw-bold mb-3">Рейтинг продаж товаров</h5>
+          <div class="table-responsive">
+            <table class="table align-middle">
+              <thead><tr>
+                <th>#</th>
+                <th>Товар</th>
+                <th>Категория</th>
+                <th class="text-center">Продано шт.</th>
+                <th class="text-end">Выручка</th>
+                <th class="text-end">Доля, %</th>
+              </tr></thead>
+              <tbody id="topProductsBody">
+                <tr><td colspan="6" class="text-center text-muted py-5">Нажмите «Сформировать»</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── ОТЧЁТ 3: Клиенты ─── -->
+      <div class="tab-pane fade" id="tab-customers">
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+          <h5 class="fw-bold mb-3"><i class="bi bi-funnel me-2 text-primary"></i>Фильтры</h5>
+          <form class="row g-3">
+            <div class="col-md-3">
+              <label class="form-label small fw-bold">Мин. сумма покупок</label>
+              <input type="number" class="form-control" id="cust_min_spent" placeholder="0" min="0">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label small fw-bold">Мин. кол-во заказов</label>
+              <input type="number" class="form-control" id="cust_min_orders" placeholder="0" min="0">
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+              <button type="button" class="btn btn-primary w-100" onclick="loadCustomerReport()">
+                <i class="bi bi-search me-2"></i>Сформировать
+              </button>
+            </div>
+          </form>
+        </div>
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+          <h5 class="fw-bold mb-3">Анализ клиентской базы</h5>
+          <div class="table-responsive">
+            <table class="table align-middle">
+              <thead><tr>
+                <th>Клиент</th>
+                <th>Телефон</th>
+                <th class="text-center">Заказов</th>
+                <th class="text-end">Куплено на</th>
+                <th class="text-end">Средний чек</th>
+                <th class="text-center">Скидка</th>
+                <th>Статус</th>
+              </tr></thead>
+              <tbody id="customerReportBody">
+                <tr><td colspan="7" class="text-center text-muted py-5">Нажмите «Сформировать»</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── ОТЧЁТ 4: Поставки (manager+) ─── -->
+      <% if (currentUser && (currentUser.role === 'admin' || currentUser.role === 'manager')) { %>
+      <div class="tab-pane fade" id="tab-shipments">
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+          <h5 class="fw-bold mb-3"><i class="bi bi-funnel me-2 text-primary"></i>Фильтры</h5>
+          <form class="row g-3">
+            <div class="col-md-3">
+              <label class="form-label small fw-bold">Поставщик</label>
+              <select class="form-select" id="ship_provider">
+                <option value="">Все поставщики</option>
+                <% (providers || []).forEach(p => { %>
+                  <option value="<%= p.id %>"><%= p.organization_name %></option>
+                <% }) %>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label small fw-bold">Дата с</label>
+              <input type="date" class="form-control" id="ship_date_from">
+            </div>
+            <div class="col-md-3">
+              <label class="form-label small fw-bold">Дата по</label>
+              <input type="date" class="form-control" id="ship_date_to">
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+              <button type="button" class="btn btn-primary w-100" onclick="loadShipmentReport()">
+                <i class="bi bi-search me-2"></i>Сформировать
+              </button>
+            </div>
+          </form>
+        </div>
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+          <h5 class="fw-bold mb-3">Статистика поставок</h5>
+          <div class="table-responsive">
+            <table class="table align-middle">
+              <thead><tr>
+                <th>Поставщик</th>
+                <th class="text-center">Поставок</th>
+                <th class="text-center">Единиц товара</th>
+                <th class="text-end">Общая стоимость</th>
+                <th class="text-end">Средняя стоимость</th>
+              </tr></thead>
+              <tbody id="shipmentReportBody">
+                <tr><td colspan="5" class="text-center text-muted py-5">Нажмите «Сформировать»</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <% } %>
+
+      <!-- ─── ОТЧЁТ 5: Прибыль по месяцам (admin only) ─── -->
+      <% if (currentUser && currentUser.role === 'admin') { %>
+      <div class="tab-pane fade" id="tab-profit">
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+          <h5 class="fw-bold mb-3"><i class="bi bi-funnel me-2 text-primary"></i>Фильтры</h5>
+          <form class="row g-3">
+            <div class="col-md-3">
+              <label class="form-label small fw-bold">Год</label>
+              <select class="form-select" id="profit_year">
+                <% for (let y = new Date().getFullYear(); y >= 2023; y--) { %>
+                  <option value="<%= y %>"><%= y %></option>
+                <% } %>
+              </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+              <button type="button" class="btn btn-primary w-100" onclick="loadProfitReport()">
+                <i class="bi bi-search me-2"></i>Сформировать
+              </button>
+            </div>
+          </form>
+        </div>
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+          <h5 class="fw-bold mb-3">Месячная прибыль (Выручка − Себестоимость − Расходы)</h5>
+          <div class="mb-4" style="height:280px">
+            <canvas id="profitChart"></canvas>
+          </div>
+          <div class="table-responsive">
+            <table class="table align-middle">
+              <thead><tr>
+                <th>Месяц</th>
+                <th class="text-end">Выручка</th>
+                <th class="text-end">Расходы</th>
+                <th class="text-end">Прибыль</th>
+              </tr></thead>
+              <tbody id="profitBody">
+                <tr><td colspan="4" class="text-center text-muted py-5">Нажмите «Сформировать»</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ─── ОТЧЁТ 6: ABC-анализ (admin only) ─── -->
+      <div class="tab-pane fade" id="tab-abc">
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+          <p class="text-muted mb-0">ABC-анализ делит товары на три группы: <strong>A</strong> (топ 20% — дают 80% выручки), <strong>B</strong> (следующие 30%), <strong>C</strong> (оставшиеся 50%).</p>
+        </div>
+        <div class="card border-0 shadow-sm rounded-4 p-4 mb-4">
+          <h5 class="fw-bold mb-3"><i class="bi bi-funnel me-2 text-primary"></i>Фильтры</h5>
+          <form class="row g-3">
+            <div class="col-md-3">
+              <label class="form-label small fw-bold">Категория</label>
+              <select class="form-select" id="abc_category">
+                <option value="">Все категории</option>
+                <% (groups || []).forEach(g => { %>
+                  <option value="<%= g.id %>"><%= g.name %></option>
+                <% }) %>
+              </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+              <button type="button" class="btn btn-primary w-100" onclick="loadAbcReport()">
+                <i class="bi bi-search me-2"></i>Сформировать
+              </button>
+            </div>
+          </form>
+        </div>
+        <div class="card border-0 shadow-sm rounded-4 p-4">
+          <h5 class="fw-bold mb-3">ABC-анализ товаров по выручке</h5>
+          <div class="table-responsive">
+            <table class="table align-middle">
+              <thead><tr>
+                <th>#</th>
+                <th>Товар</th>
+                <th class="text-end">Выручка</th>
+                <th class="text-end">Доля, %</th>
+                <th class="text-end">Накопл. доля, %</th>
+                <th class="text-center">Группа</th>
+              </tr></thead>
+              <tbody id="abcBody">
+                <tr><td colspan="6" class="text-center text-muted py-5">Нажмите «Сформировать»</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <% } %>
+
+    </div><!-- /tab-content -->
+  </div>
+</div>
+
+<script>
+const formatMoney = v => Number(v || 0).toLocaleString('ru') + ' ₽';
+
+// ─── Отчёт 1: Выручка ───
+async function loadRevenueReport() {
+  const from = document.getElementById('rev_date_from').value;
+  const to = document.getElementById('rev_date_to').value;
+  const params = new URLSearchParams();
+  if (from) params.set('date_from', from);
+  if (to) params.set('date_to', to);
+
+  const r = await fetch('/api/reports/revenue?' + params.toString());
+  const data = await r.json();
+
+  const body = document.getElementById('revenueBody');
+  const summary = document.getElementById('revSummary');
+  document.getElementById('revRowCount').textContent = data.rows.length + ' записей';
+
+  if (!data.rows.length) {
+    body.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-4">Нет данных за выбранный период</td></tr>';
+    summary.innerHTML = '';
+    return;
+  }
+
+  summary.innerHTML = `
+    <div class="col-md-3"><div class="stat-card p-3 border-0 shadow-sm rounded-4 bg-white">
+      <div class="text-secondary small fw-bold text-uppercase mb-1">Общая выручка</div>
+      <div class="h4 fw-bold text-primary">${formatMoney(data.totals.revenue)}</div>
+    </div></div>
+    <div class="col-md-3"><div class="stat-card p-3 border-0 shadow-sm rounded-4 bg-white">
+      <div class="text-secondary small fw-bold text-uppercase mb-1">Продаж всего</div>
+      <div class="h4 fw-bold text-success">${data.totals.count}</div>
+    </div></div>
+    <div class="col-md-3"><div class="stat-card p-3 border-0 shadow-sm rounded-4 bg-white">
+      <div class="text-secondary small fw-bold text-uppercase mb-1">Средний чек</div>
+      <div class="h4 fw-bold text-info">${formatMoney(data.totals.avg)}</div>
+    </div></div>
+  `;
+
+  body.innerHTML = data.rows.map(row => `
+    <tr>
+      <td>${new Date(row.sale_date).toLocaleDateString('ru-RU')}</td>
+      <td><span class="badge bg-secondary-subtle text-dark">${row.count}</span></td>
+      <td class="text-end fw-bold">${formatMoney(row.revenue)}</td>
+      <td class="text-end">${formatMoney(row.avg_check)}</td>
+    </tr>
+  `).join('');
+}
+function resetRevenue() {
+  document.getElementById('rev_date_from').value = '';
+  document.getElementById('rev_date_to').value = '';
+  loadRevenueReport();
+}
+
+// ─── Отчёт 2: Топ товаров ───
+async function loadTopProducts() {
+  const cat = document.getElementById('prod_category').value;
+  const from = document.getElementById('prod_date_from').value;
+  const to = document.getElementById('prod_date_to').value;
+  const params = new URLSearchParams();
+  if (cat) params.set('category_id', cat);
+  if (from) params.set('date_from', from);
+  if (to) params.set('date_to', to);
+
+  const r = await fetch('/api/reports/top-products?' + params.toString());
+  const data = await r.json();
+  const totalRev = data.reduce((s, p) => s + Number(p.revenue || 0), 0);
+
+  document.getElementById('topProductsBody').innerHTML = data.map((p, i) => {
+    const share = totalRev > 0 ? ((Number(p.revenue) / totalRev) * 100).toFixed(1) : '0.0';
+    return `<tr>
+      <td><span class="fw-bold text-muted">${i + 1}</span></td>
+      <td>${p.name}</td>
+      <td><span class="badge bg-secondary-subtle text-dark">${p.category || '—'}</span></td>
+      <td class="text-center fw-bold">${p.total_qty}</td>
+      <td class="text-end">${formatMoney(p.revenue)}</td>
+      <td class="text-end"><span class="badge bg-primary-subtle text-primary">${share}%</span></td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="6" class="text-center text-muted py-4">Нет данных</td></tr>';
+}
+
+// ─── Отчёт 3: Клиенты ───
+async function loadCustomerReport() {
+  const minSpent = document.getElementById('cust_min_spent').value || 0;
+  const minOrders = document.getElementById('cust_min_orders').value || 0;
+  const r = await fetch(`/api/reports/customers?min_spent=${minSpent}&min_orders=${minOrders}`);
+  const data = await r.json();
+
+  document.getElementById('customerReportBody').innerHTML = data.map(c => {
+    let status = '<span class="badge bg-secondary-subtle text-secondary">Новый</span>';
+    if (c.total_orders >= 10) status = '<span class="badge bg-warning-subtle text-warning">VIP</span>';
+    else if (c.total_orders >= 3) status = '<span class="badge bg-success-subtle text-success">Постоянный</span>';
+    return `<tr>
+      <td class="fw-bold">${c.name}</td>
+      <td><a href="tel:${c.phone}" class="text-decoration-none">${c.phone}</a></td>
+      <td class="text-center">${c.total_orders}</td>
+      <td class="text-end fw-bold">${formatMoney(c.total_spent)}</td>
+      <td class="text-end">${formatMoney(c.avg_order)}</td>
+      <td class="text-center">${c.discount}%</td>
+      <td>${status}</td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="7" class="text-center text-muted py-4">Нет данных</td></tr>';
+}
+
+// ─── Отчёт 4: Поставки ───
+async function loadShipmentReport() {
+  const provider = document.getElementById('ship_provider')?.value || '';
+  const from = document.getElementById('ship_date_from')?.value || '';
+  const to = document.getElementById('ship_date_to')?.value || '';
+  const params = new URLSearchParams();
+  if (provider) params.set('provider_id', provider);
+  if (from) params.set('date_from', from);
+  if (to) params.set('date_to', to);
+  const r = await fetch('/api/reports/shipments?' + params);
+  const data = await r.json();
+  document.getElementById('shipmentReportBody').innerHTML = data.map(s => `<tr>
+    <td class="fw-bold">${s.provider}</td>
+    <td class="text-center">${s.shipments_count}</td>
+    <td class="text-center">${s.total_units}</td>
+    <td class="text-end">${formatMoney(s.total_cost)}</td>
+    <td class="text-end">${formatMoney(s.avg_cost)}</td>
+  </tr>`).join('') || '<tr><td colspan="5" class="text-center text-muted py-4">Нет данных</td></tr>';
+}
+
+// ─── Отчёт 5: Прибыль ───
+let profitChartInstance = null;
+async function loadProfitReport() {
+  const year = document.getElementById('profit_year')?.value;
+  if (!year) return;
+  const r = await fetch(`/api/reports/profit?year=${year}`);
+  const data = await r.json();
+  const months = ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'];
+
+  document.getElementById('profitBody').innerHTML = data.map(m => `<tr>
+    <td>${months[m.month - 1]} ${year}</td>
+    <td class="text-end">${formatMoney(m.revenue)}</td>
+    <td class="text-end text-danger">${formatMoney(m.expenses)}</td>
+    <td class="text-end fw-bold ${Number(m.profit) >= 0 ? 'text-success' : 'text-danger'}">${formatMoney(m.profit)}</td>
+  </tr>`).join('') || '<tr><td colspan="4" class="text-center text-muted py-4">Нет данных</td></tr>';
+
+  const ctx = document.getElementById('profitChart').getContext('2d');
+  if (profitChartInstance) profitChartInstance.destroy();
+  profitChartInstance = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: data.map(m => months[m.month - 1]),
+      datasets: [
+        { label: 'Выручка', data: data.map(m => m.revenue), backgroundColor: 'rgba(99,102,241,0.7)', borderRadius: 6 },
+        { label: 'Прибыль', data: data.map(m => m.profit), backgroundColor: 'rgba(34,197,94,0.7)', borderRadius: 6 }
+      ]
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } } }
+  });
+}
+
+// ─── Отчёт 6: ABC ───
+async function loadAbcReport() {
+  const cat = document.getElementById('abc_category')?.value || '';
+  const r = await fetch(`/api/reports/abc?category_id=${cat}`);
+  const data = await r.json();
+  let cumulative = 0;
+  const total = data.reduce((s, p) => s + Number(p.revenue || 0), 0);
+  document.getElementById('abcBody').innerHTML = data.map((p, i) => {
+    const share = total > 0 ? (Number(p.revenue) / total * 100) : 0;
+    cumulative += share;
+    const group = cumulative <= 80 ? 'A' : cumulative <= 95 ? 'B' : 'C';
+    const badgeColor = group === 'A' ? 'bg-danger-subtle text-danger' : group === 'B' ? 'bg-warning-subtle text-warning' : 'bg-secondary-subtle text-secondary';
+    return `<tr>
+      <td class="text-muted">${i + 1}</td>
+      <td>${p.name}</td>
+      <td class="text-end">${formatMoney(p.revenue)}</td>
+      <td class="text-end">${share.toFixed(1)}%</td>
+      <td class="text-end">${cumulative.toFixed(1)}%</td>
+      <td class="text-center"><span class="badge ${badgeColor} fw-bold fs-6">${group}</span></td>
+    </tr>`;
+  }).join('') || '<tr><td colspan="6" class="text-center text-muted py-4">Нет данных</td></tr>';
+}
+
+// Инициализация — выручка за текущий месяц
+document.addEventListener('DOMContentLoaded', () => {
+  const today = new Date();
+  const firstDay = new Date(today.getFullYear(), today.getMonth(), 1).toISOString().split('T')[0];
+  const lastDay = today.toISOString().split('T')[0];
+  document.getElementById('rev_date_from').value = firstDay;
+  document.getElementById('rev_date_to').value = lastDay;
+  loadRevenueReport();
+});
+</script>
+
+<%- include('partials/footer') %>

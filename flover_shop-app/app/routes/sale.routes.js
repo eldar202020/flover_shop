@@ -24,6 +24,17 @@ module.exports = app => {
    *           type: string
    *         total_amount:
    *           type: number
+   *         products:
+   *           type: array
+   *           items:
+   *             type: object
+   *             properties:
+   *               id_product:
+   *                 type: integer
+   *               quantity:
+   *                 type: integer
+   *               price:
+   *                 type: number
    */
 
   /**

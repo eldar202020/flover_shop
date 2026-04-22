@@ -1,0 +1,16 @@
+  <!-- Toast контейнер -->
+  <div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="appToast" class="toast align-items-center border-0" role="alert">
+      <div class="d-flex">
+        <div class="toast-body fw-medium" id="toastMsg">Сообщение</div>
+        <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Общие утилиты -->
+  <script src="/js/utils.js"></script>
+  <!-- Страничные скрипты (если переданы) -->
+  <%- typeof pageScripts !== 'undefined' ? pageScripts : '' %>
+</body>
+</html>

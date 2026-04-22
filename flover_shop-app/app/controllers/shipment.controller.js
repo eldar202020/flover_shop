@@ -1,15 +1,38 @@
 const db = require("../models");
 const Shipment = db.shipment;
+const Product = db.product;
 
-exports.create = (req, res) => {
-  const shipment = {
-    product_id: req.body.product_id,
-    provider_id: req.body.provider_id,
-    count: req.body.count
-  };
-  Shipment.create(shipment)
-    .then(data => res.send(data))
-    .catch(err => res.status(500).send({ message: "Error creating Shipment." }));
+exports.create = async (req, res) => {
+  const { product_id, provider_id, count, unit_price, purchase_date } = req.body;
+
+  if (!product_id || !provider_id || !count) {
+    return res.status(400).send({ message: "Content can not be empty!" });
+  }
+
+  const t = await db.sequelize.transaction();
+  try {
+    // 1. Создаем накладную
+    const shipmentData = {
+      product_id,
+      provider_id,
+      count,
+      unit_price: unit_price || 0,
+      purchase_date: purchase_date || new Date().toISOString(),
+    };
+    const data = await Shipment.create(shipmentData, { transaction: t });
+
+    // 2. Увеличиваем остаток товара на складе
+    const product = await Product.findByPk(product_id, { transaction: t });
+    if (product) {
+      await product.increment("quantity", { by: count, transaction: t });
+    }
+
+    await t.commit();
+    res.send(data);
+  } catch (err) {
+    await t.rollback();
+    res.status(500).send({ message: err.message || "Error creating Shipment." });
+  }
 };
 
 exports.findAll = (req, res) => {

@@ -1,0 +1,94 @@
+<%- include('partials/head') %>
+<%- include('partials/sidebar') %>
+
+<div class="main-content d-flex flex-column">
+  <%- include('partials/navbar') %>
+
+  <div class="container-fluid p-4">
+    <div class="mb-4">
+      <h2 class="mb-1">База клиентов</h2>
+      <p class="text-muted mb-0">Профили покупателей и статистика лояльности</p>
+    </div>
+
+    <div class="row g-3">
+      <% customers.forEach(c => {
+        const customerSales = sales.filter(s => s.id_customer === c.id);
+        const totalSpent    = customerSales.reduce((sum, s) => sum + Number(s.total_amount || 0), 0);
+        const disc          = Number(c.personal_discount || 0);
+        const purchases     = Number(c.personal_purchases || customerSales.length);
+        const ratingPct     = Math.min(Math.round((purchases / 20) * 40 + (totalSpent / 50000) * 60), 100);
+        const ratingLabel   = ratingPct > 80 ? ['⭐','VIP','primary'] : ratingPct > 50 ? ['👍','Постоянный','success'] : ratingPct > 20 ? ['👤','Активный','info'] : ['🆕','Новичок','secondary'];
+      %>
+      <div class="col-md-6 col-xl-4">
+        <div class="card p-4">
+          <div class="d-flex justify-content-between align-items-start mb-3">
+            <div>
+              <h5 class="mb-1 fw-semibold"><%= c.name %></h5>
+              <span class="text-muted small"><i class="bi bi-telephone me-1"></i><%= c.phone %></span>
+            </div>
+            <span class="badge bg-<%= ratingLabel[2] %>-subtle text-<%= ratingLabel[2] %> border border-<%= ratingLabel[2] %>-subtle fs-6 px-2">
+              <%= ratingLabel[0] %> <%= ratingLabel[1] %>
+            </span>
+          </div>
+
+          <!-- Рейтинг -->
+          <div class="mb-3">
+            <div class="d-flex justify-content-between mb-1">
+              <small class="text-muted text-uppercase fw-semibold" style="font-size:.7rem">Рейтинг</small>
+              <small class="fw-bold"><%= ratingPct %>%</small>
+            </div>
+            <div class="progress" style="height:6px">
+              <div class="progress-bar bg-<%= ratingLabel[2] %>" style="width:<%= ratingPct %>%"></div>
+            </div>
+          </div>
+
+          <!-- День рождения и теги -->
+          <div class="d-flex flex-wrap gap-1 mb-3">
+            <% if (c.birthday) { %>
+              <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill extra-small">
+                <i class="bi bi-gift me-1"></i><%= new Date(c.birthday).toLocaleDateString('ru-RU') %>
+              </span>
+            <% } %>
+            <% if (c.tags) { %>
+              <% c.tags.split(',').forEach(tag => { %>
+                <span class="badge bg-light text-dark border extra-small rounded-pill"><%= tag.trim() %></span>
+              <% }) %>
+            <% } %>
+          </div>
+
+          <!-- Метрики -->
+          <div class="row g-2 text-center mb-3">
+            <div class="col-4">
+              <div class="bg-light rounded p-2">
+                <div class="fw-bold fs-5"><%= customerSales.length %></div>
+                <div class="text-muted" style="font-size:.7rem">Покупок</div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="bg-light rounded p-2">
+                <div class="fw-bold fs-5 text-success"><%= disc %>%</div>
+                <div class="text-muted" style="font-size:.7rem">Скидка</div>
+              </div>
+            </div>
+            <div class="col-4">
+              <div class="bg-light rounded p-2 text-truncate">
+                <div class="fw-bold" style="font-size:1rem; line-height:1.2"><%= totalSpent.toLocaleString('ru') %></div>
+                <div class="text-muted" style="font-size:.7rem">Траты ₽</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Заметки -->
+          <% if (c.notes) { %>
+          <div class="p-2 bg-warning bg-opacity-10 rounded border border-warning border-opacity-25 extra-small text-muted italic">
+             <i class="bi bi-stickies me-1"></i><%= c.notes %>
+          </div>
+          <% } %>
+        </div>
+      </div>
+      <% }) %>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

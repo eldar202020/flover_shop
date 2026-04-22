@@ -1,0 +1,144 @@
+<%- include('partials/head') %>
+<%- include('partials/sidebar') %>
+
+<div class="main-content d-flex flex-column">
+  <%- include('partials/navbar') %>
+
+  <div class="container-fluid p-4">
+    <!-- Заголовок -->
+    <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-3">
+      <div>
+        <h2 class="mb-1 text-gradient fw-bold">Панель управления</h2>
+        <p class="text-muted mb-0">Анализ бизнеса в реальном времени</p>
+      </div>
+      <div class="text-md-end">
+        <div class="fw-bold fs-5 text-dark">
+          <%= new Date().toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }) %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Основные KPI (упрощенная верстка без сложных массивов) -->
+    <div class="row g-3 mb-4">
+      <div class="col-sm-6 col-md-3">
+        <div class="stat-card p-3 border-0 shadow-sm rounded-4 bg-white">
+          <div class="text-secondary small fw-bold text-uppercase mb-2">Выручка сегодня</div>
+          <div class="h3 mb-0 fw-bold text-primary">
+            <%= Number(stats.todayRevenue || 0).toLocaleString('ru') %> ₽
+          </div>
+          <div class="text-muted extra-small mt-2">Всего: <%= Number(stats.totalRevenue || 0).toLocaleString('ru') %> ₽</div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-md-3">
+        <div class="stat-card p-3 border-0 shadow-sm rounded-4 bg-white">
+          <div class="text-secondary small fw-bold text-uppercase mb-2">Продаж сегодня</div>
+          <div class="h3 mb-0 fw-bold text-success"><%= stats.salesCount %></div>
+          <div class="text-muted extra-small mt-2">Успешных транзакций</div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-md-3">
+        <div class="stat-card p-3 border-0 shadow-sm rounded-4 bg-white">
+          <div class="text-secondary small fw-bold text-uppercase mb-2">Низкий остаток</div>
+          <div class="h3 mb-0 fw-bold <%= stats.lowStockCount > 0 ? 'text-danger' : 'text-dark' %>">
+            <%= stats.lowStockCount %>
+          </div>
+          <div class="text-muted extra-small mt-2">Требуют внимания</div>
+        </div>
+      </div>
+      <div class="col-sm-6 col-md-3">
+        <div class="stat-card p-3 border-0 shadow-sm rounded-4 bg-white">
+          <div class="text-secondary small fw-bold text-uppercase mb-2">Прибыль (Net)</div>
+          <div class="h3 mb-0 fw-bold <%= stats.netProfit < 0 ? 'text-danger' : 'text-success' %>">
+            <%= Number(stats.netProfit || 0).toLocaleString('ru') %> ₽
+          </div>
+          <div class="text-muted extra-small mt-2">За текущий период</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+      <!-- График -->
+      <div class="col-lg-8">
+        <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+          <h5 class="fw-bold mb-4">Топ продаж (товары)</h5>
+          <div class="chart-container" style="height: 300px;">
+            <% if (topProducts && topProducts.length > 0) { %>
+              <canvas id="topProductsChart"></canvas>
+            <% } else { %>
+              <p class="text-center text-muted mt-5">Нет данных для графика</p>
+            <% } %>
+          </div>
+        </div>
+      </div>
+      <!-- Топ клиентов -->
+      <div class="col-lg-4">
+        <div class="card border-0 shadow-sm rounded-4 p-4 h-100">
+          <h5 class="fw-bold mb-3">Топ клиентов</h5>
+          <% (topCustomers || []).forEach((c, i) => { %>
+            <div class="d-flex justify-content-between mb-2">
+              <span class="small"><%= i+1 %>. <%= c.name %></span>
+              <span class="fw-bold small"><%= Number(c.spent || 0).toLocaleString('ru') %> ₽</span>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Таблица продаж -->
+    <div class="card border-0 shadow-sm rounded-4 p-4">
+      <h5 class="fw-bold mb-4">Последние транзакции</h5>
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Дата</th>
+              <th>Клиент</th>
+              <th class="text-end">Сумма</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% (recentSales || []).forEach(sale => { %>
+              <tr>
+                <td>#<%= sale.id %></td>
+                <td class="small">
+                  <%= sale.sale_date ? new Date(sale.sale_date).toLocaleString('ru-RU') : '—' %>
+                </td>
+                <td><%= sale.customer ? sale.customer.name : '—' %></td>
+                <td class="text-end fw-bold"><%= Number(sale.total_amount || 0).toLocaleString('ru') %> ₽</td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<% if (topProducts && topProducts.length > 0) { %>
+<script>
+  window.addEventListener('DOMContentLoaded', () => {
+    const ctx = document.getElementById('topProductsChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: <%- JSON.stringify(topProducts.map(p => p.name)) %>,
+        datasets: [{
+          label: 'Продано шт.',
+          data: <%- JSON.stringify(topProducts.map(p => p.qty)) %>,
+          backgroundColor: 'rgba(99, 102, 241, 0.7)',
+          borderRadius: 8
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } }
+      }
+    });
+  });
+</script>
+<% } %>
+
+<%- include('partials/footer') %>

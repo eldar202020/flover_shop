@@ -1,4 +1,3 @@
-
 services:
   postgresdb:
     image: postgres
@@ -12,6 +11,7 @@ services:
       - $POSTGRESDB_LOCAL_PORT:$POSTGRESDB_DOCKER_PORT
     volumes:
       - db:/var/lib/postgres
+
   app:
     depends_on:
       - postgresdb
@@ -19,7 +19,7 @@ services:
     restart: unless-stopped
     env_file: ./.env
     ports:
-    - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
+      - $NODE_LOCAL_PORT:$NODE_DOCKER_PORT
     environment:
       - DB_HOST=postgresdb
       - DB_USER=$POSTGRESDB_USER
@@ -28,5 +28,6 @@ services:
       - DB_PORT=$POSTGRESDB_DOCKER_PORT
     stdin_open: true
     tty: true
+
 volumes:
   db:

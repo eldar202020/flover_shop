@@ -1,0 +1,135 @@
+<%- include('partials/head') %>
+<%- include('partials/sidebar') %>
+
+<div class="main-content d-flex flex-column">
+  <%- include('partials/navbar') %>
+
+  <div class="container-fluid p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h2 class="mb-1">Приходные накладные</h2>
+        <p class="text-muted mb-0">История поступления товаров от поставщиков</p>
+      </div>
+      <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#shipmentModal">
+        <i class="bi bi-file-earmark-plus me-2"></i>Оформить приход
+      </button>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Дата</th>
+              <th>Поставщик</th>
+              <th>Товар</th>
+              <th class="text-center">Кол-во</th>
+              <th class="text-end">Цена/ед.</th>
+              <th class="text-end">Итого</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (shipments.length === 0) { %>
+            <tr><td colspan="7" class="text-center py-5 text-muted"><i class="bi bi-inbox fs-2 d-block mb-2"></i>Накладных пока нет</td></tr>
+            <% } %>
+            <% shipments.forEach(s => {
+              const provider = providers.find(p => p.id === s.provider_id);
+              const product  = products.find(p => p.id === s.product_id);
+              const total    = (s.count || 0) * (s.unit_price || 0);
+            %>
+            <tr>
+              <td><span class="badge bg-light text-dark border">#<%= s.id %></span></td>
+              <td><%= s.purchase_date ? new Date(s.purchase_date).toLocaleDateString('ru-RU') : '—' %></td>
+              <td class="fw-medium"><%= provider ? provider.organization_name : '—' %></td>
+              <td><%= product ? product.name : '—' %></td>
+              <td class="text-center"><%= s.count %> шт.</td>
+              <td class="text-end"><%= Number(s.unit_price || 0).toLocaleString('ru') %> ₽</td>
+              <td class="text-end fw-semibold"><%= total.toLocaleString('ru') %> ₽</td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Модал: Новая накладная -->
+<div class="modal fade" id="shipmentModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <h5 class="modal-title"><i class="bi bi-box-arrow-in-down me-2 text-success"></i>Новая накладная</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body pt-0">
+        <form id="shipmentForm">
+          <div class="mb-3">
+            <label class="form-label fw-medium">Поставщик</label>
+            <select class="form-select" id="shipProvider" required>
+              <option value="">Выберите поставщика...</option>
+              <% providers.forEach(p => { %>
+              <option value="<%= p.id %>"><%= p.organization_name %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label fw-medium">Товар</label>
+            <select class="form-select" id="shipProduct" required>
+              <option value="">Выберите товар...</option>
+              <% products.forEach(p => { %>
+              <option value="<%= p.id %>"><%= p.name %></option>
+              <% }) %>
+            </select>
+          </div>
+          <div class="row g-3">
+            <div class="col-6">
+              <label class="form-label fw-medium">Количество</label>
+              <input type="number" class="form-control" id="shipCount" min="1" required>
+            </div>
+            <div class="col-6">
+              <label class="form-label fw-medium">Цена за ед. (₽)</label>
+              <input type="number" class="form-control" id="shipPrice" min="0" step="0.01" required>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Отмена</button>
+        <button type="button" class="btn btn-success" id="btnSubmitShipment">
+          <i class="bi bi-check-lg me-1"></i>Принять на склад
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+document.getElementById('btnSubmitShipment').addEventListener('click', async () => {
+  const providerId = document.getElementById('shipProvider').value;
+  const productId  = document.getElementById('shipProduct').value;
+  const count      = parseInt(document.getElementById('shipCount').value, 10);
+  const unitPrice  = parseFloat(document.getElementById('shipPrice').value);
+
+  if (!providerId || !productId || !count || !unitPrice) {
+    showToast('Заполните все поля!', 'danger'); return;
+  }
+
+  try {
+    const res = await fetch('/api/shipment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ provider_id: +providerId, product_id: +productId, count, unit_price: unitPrice, purchase_date: new Date().toISOString() })
+    });
+    if (!res.ok) throw new Error('Ошибка сервера');
+    showToast('Товар принят на склад!', 'success');
+    bootstrap.Modal.getInstance(document.getElementById('shipmentModal')).hide();
+    setTimeout(() => location.reload(), 700);
+  } catch (e) {
+    showToast(e.message, 'danger');
+  }
+});
+</script>
+
+<%- include('partials/footer') %>

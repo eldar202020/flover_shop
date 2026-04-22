@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Вход — Flover Shop ERP</title>
+  <meta name="description" content="Вход в систему управления флористическим магазином Flover Shop"/>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Outfit:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Inter', sans-serif;
+    }
+    .login-card {
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 2.5rem;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+    }
+    .login-card .logo-area {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+    .login-card .logo-area .logo-icon {
+      font-size: 3rem;
+      color: #e879a0;
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    .login-card .logo-area h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: #fff;
+      margin: 0;
+    }
+    .login-card .logo-area p {
+      color: rgba(255,255,255,0.5);
+      margin: 0.25rem 0 0;
+      font-size: 0.85rem;
+    }
+    .login-card label {
+      color: rgba(255,255,255,0.8);
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-bottom: 0.4rem;
+    }
+    .login-card .form-control {
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: #fff;
+      border-radius: 10px;
+      padding: 0.65rem 1rem;
+      transition: border-color 0.2s;
+    }
+    .login-card .form-control:focus {
+      background: rgba(255,255,255,0.12);
+      border-color: #e879a0;
+      color: #fff;
+      box-shadow: 0 0 0 3px rgba(232,121,160,0.2);
+    }
+    .login-card .form-control::placeholder { color: rgba(255,255,255,0.3); }
+    .btn-login {
+      background: linear-gradient(135deg, #e879a0, #9b59b6);
+      border: none;
+      border-radius: 10px;
+      color: #fff;
+      font-weight: 600;
+      padding: 0.7rem;
+      font-size: 1rem;
+      width: 100%;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+    .btn-login:hover { opacity: 0.9; transform: translateY(-1px); }
+    .alert-danger-custom {
+      background: rgba(220,53,69,0.2);
+      border: 1px solid rgba(220,53,69,0.4);
+      color: #f8d7da;
+      border-radius: 10px;
+      font-size: 0.85rem;
+    }
+    .role-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.6);
+      border-radius: 6px;
+      padding: 0.2rem 0.6rem;
+      font-size: 0.75rem;
+      margin: 0.2rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-card">
+    <div class="logo-area">
+      <i class="bi bi-flower1 logo-icon"></i>
+      <h1>Flover Shop</h1>
+      <p>ERP / CRM Система управления</p>
+    </div>
+
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="alert-danger-custom p-3 mb-3">
+        <i class="bi bi-exclamation-triangle me-2"></i><%= error %>
+      </div>
+    <% } %>
+
+    <form method="POST" action="/login" id="loginForm">
+      <div class="mb-3">
+        <label for="username">Имя пользователя</label>
+        <input type="text" class="form-control" id="username" name="username"
+               placeholder="Введите логин" required autocomplete="username"
+               value="<%= typeof username !== 'undefined' ? username : '' %>">
+      </div>
+      <div class="mb-4">
+        <label for="password">Пароль</label>
+        <div class="position-relative">
+          <input type="password" class="form-control" id="password" name="password"
+                 placeholder="Введите пароль" required autocomplete="current-password">
+          <button type="button" class="btn btn-sm position-absolute end-0 top-50 translate-middle-y me-2 border-0 text-secondary"
+                  onclick="togglePass()" style="background:transparent">
+            <i class="bi bi-eye" id="eyeIcon"></i>
+          </button>
+        </div>
+      </div>
+      <button type="submit" class="btn-login" id="loginBtn">
+        <i class="bi bi-box-arrow-in-right me-2"></i>Войти в систему
+      </button>
+    </form>
+
+    <div class="text-center mt-4">
+      <small class="d-block mb-2" style="color:rgba(255,255,255,0.4)">Доступные роли:</small>
+      <span class="role-badge"><i class="bi bi-shield-fill me-1"></i>Администратор</span>
+      <span class="role-badge"><i class="bi bi-person-gear me-1"></i>Менеджер</span>
+      <span class="role-badge"><i class="bi bi-cash-register me-1"></i>Кассир</span>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    function togglePass() {
+      const pw = document.getElementById('password');
+      const icon = document.getElementById('eyeIcon');
+      if (pw.type === 'password') {
+        pw.type = 'text';
+        icon.className = 'bi bi-eye-slash';
+      } else {
+        pw.type = 'password';
+        icon.className = 'bi bi-eye';
+      }
+    }
+    document.getElementById('loginForm').addEventListener('submit', function() {
+      document.getElementById('loginBtn').innerHTML =
+        '<span class="spinner-border spinner-border-sm me-2"></span>Вход...';
+    });
+  </script>
+</body>
+</html>

@@ -12,7 +12,10 @@ exports.create = (req, res) => {
     name: req.body.name,
     description: req.body.description,
     id_category: req.body.id_category,
-    quantity: req.body.quantity
+    quantity: req.body.quantity || 0,
+    cost_price: req.body.cost_price || 0,
+    min_threshold: req.body.min_threshold || 5,
+    additional_attributes: req.body.additional_attributes || {}
   };
   Product.create(product)
     .then(data => res.send(data))

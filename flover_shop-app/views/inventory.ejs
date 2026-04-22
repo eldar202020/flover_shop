@@ -1,0 +1,65 @@
+<%- include('partials/head') %>
+<%- include('partials/sidebar') %>
+
+<div class="main-content d-flex flex-column">
+  <%- include('partials/navbar') %>
+
+  <div class="container-fluid p-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h2 class="mb-1">Склад и товары</h2>
+        <p class="text-muted mb-0">Текущие остатки и управление запасами</p>
+      </div>
+      <div class="text-end">
+        <span class="badge bg-danger-subtle text-danger p-2 px-3 border border-danger-subtle rounded-pill">
+          <%= products.filter(p => p.quantity <= (p.min_threshold || 5)).length %> Крит. остатков
+        </span>
+      </div>
+    </div>
+
+    <!-- Список товаров -->
+    <div class="table-wrap border-0 shadow-sm">
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Название товара</th>
+              <th>Категория</th>
+              <th class="text-end">Себестоимость</th>
+              <th class="text-center">Остаток</th>
+              <th class="text-center">Порог</th>
+              <th class="text-center">Статус</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% products.forEach(p => {
+              const group = groups.find(g => g.id === p.id_category);
+              const isLow = p.quantity <= (p.min_threshold || 5);
+              const status = p.quantity > 50 ? ['success','В наличии'] : !isLow ? ['warning','Мало'] : ['danger','Заканчивается'];
+            %>
+            <tr class="<%= isLow ? 'bg-danger-subtle bg-opacity-25' : '' %>">
+              <td><span class="text-muted small">#<%= p.id %></span></td>
+              <td>
+                <div class="fw-bold"><%= p.name %></div>
+                <div class="extra-small text-muted"><%= p.description || 'Нет описания' %></div>
+              </td>
+              <td><span class="badge bg-light text-dark border"><%= group ? group.name : '—' %></span></td>
+              <td class="text-end fw-medium"><%= Number(p.cost_price || 0).toLocaleString('ru') %> ₽</td>
+              <td class="text-center fw-bold fs-5 <%= isLow ? 'text-danger' : '' %>"><%= p.quantity %></td>
+              <td class="text-center text-muted small"><%= p.min_threshold || 5 %></td>
+              <td class="text-center">
+                <span class="badge bg-<%= status[0] %>-subtle text-<%= status[0] %> border border-<%= status[0] %>-subtle px-3 rounded-pill">
+                  <%= status[1] %>
+                </span>
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('partials/footer') %>

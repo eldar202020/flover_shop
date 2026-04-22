@@ -21,6 +21,9 @@ module.exports = app => {
    *           type: integer
    *         quantity:
    *           type: integer
+   *         additional_attributes:
+   *           type: object
+   *           description: Гибкие атрибуты (цвет, длина стебля и т.д.)
    */
 
   /**

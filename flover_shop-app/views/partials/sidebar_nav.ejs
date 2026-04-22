@@ -1,0 +1,54 @@
+<ul class="nav flex-column p-3">
+  <li class="nav-item">
+    <a href="/" class="nav-link text-white <%= (typeof activePage !== 'undefined' && activePage === 'dashboard') ? 'active' : '' %>">
+      <i class="bi bi-speedometer2 me-2"></i>Дашборд
+    </a>
+  </li>
+  <li class="nav-item">
+    <a href="/sales" class="nav-link text-white <%= (typeof activePage !== 'undefined' && activePage === 'sales') ? 'active' : '' %>">
+      <i class="bi bi-cart-check me-2"></i>Продажи
+    </a>
+  </li>
+  <li class="nav-item">
+    <a href="/inventory" class="nav-link text-white <%= (typeof activePage !== 'undefined' && activePage === 'inventory') ? 'active' : '' %>">
+      <i class="bi bi-box-seam me-2"></i>Склад и товары
+    </a>
+  </li>
+  <li class="nav-item">
+    <a href="/customers" class="nav-link text-white <%= (typeof activePage !== 'undefined' && activePage === 'customers') ? 'active' : '' %>">
+      <i class="bi bi-people me-2"></i>Клиенты
+    </a>
+  </li>
+
+  <% if (typeof currentUser !== 'undefined' && currentUser && (currentUser.role === 'admin' || currentUser.role === 'manager')) { %>
+  <li class="nav-item">
+    <a href="/shipments" class="nav-link text-white <%= (typeof activePage !== 'undefined' && activePage === 'shipments') ? 'active' : '' %>">
+      <i class="bi bi-file-earmark-arrow-down me-2"></i>Накладные
+    </a>
+  </li>
+  <li class="nav-item">
+    <a href="/expenses" class="nav-link text-white <%= (typeof activePage !== 'undefined' && activePage === 'expenses') ? 'active' : '' %>">
+      <i class="bi bi-wallet2 me-2"></i>Расходы
+    </a>
+  </li>
+  <li class="nav-item">
+    <a href="/reports" class="nav-link text-white <%= (typeof activePage !== 'undefined' && activePage === 'reports') ? 'active' : '' %>">
+      <i class="bi bi-bar-chart-line me-2"></i>Отчёты
+    </a>
+  </li>
+  <% } %>
+
+  <% if (typeof currentUser !== 'undefined' && currentUser && currentUser.role === 'admin') { %>
+  <li class="nav-item">
+    <a href="/users" class="nav-link text-white <%= (typeof activePage !== 'undefined' && activePage === 'users') ? 'active' : '' %>">
+      <i class="bi bi-shield-lock me-2"></i>Пользователи
+    </a>
+  </li>
+  <% } %>
+
+  <li class="nav-item mt-3">
+    <a href="/api-docs" target="_blank" class="nav-link text-secondary">
+      <i class="bi bi-code-square me-2"></i>Swagger API
+    </a>
+  </li>
+</ul>
