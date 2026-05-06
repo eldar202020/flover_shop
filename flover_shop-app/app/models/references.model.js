@@ -1,5 +1,5 @@
 module.exports = (db) => {
-  // === БЛОК 2. Ссылочная целостность (Один-ко-многим) ===
+  // Ссылочная целостность (Один-ко-многим)
   // Связь ProductGroup (самореференс)
   db.productGroup.belongsTo(db.productGroup, { foreignKey: "id_base_goods_group" });
   
@@ -15,7 +15,7 @@ module.exports = (db) => {
   db.sale.belongsTo(db.customer, { foreignKey: "id_customer" });
 
 
-  // === БЛОК 3. Разрешение связи "Многие-ко-многим" (BelongsToMany) ===
+  // Разрешение связи "Многие-ко-многим" (BelongsToMany)
   // Связи Product in PriceList (Промежуточная таблица)
   db.prodInListPrice.belongsTo(db.product, { foreignKey: "id_product" });
   db.prodInListPrice.belongsTo(db.priceList, { foreignKey: "id_price_list" });

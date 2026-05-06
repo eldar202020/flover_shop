@@ -11,7 +11,6 @@ router.get("/login", (req, res) => {
   if (req.session && req.session.user) return res.redirect("/");
   res.render("login", { title: "Вход", error: null });
 });
-
 // POST /login
 router.post("/login", async (req, res) => {
   const { username, password } = req.body;
@@ -30,13 +29,10 @@ router.post("/login", async (req, res) => {
     res.render("login", { title: "Вход", error: "Ошибка сервера: " + err.message });
   }
 });
-
 // GET /logout
 router.get("/logout", (req, res) => {
   req.session.destroy(() => res.redirect("/login"));
 });
-
-
 // Дашборд
 router.get("/", requireLogin, async (req, res) => {
   try {
@@ -71,7 +67,6 @@ router.get("/", requireLogin, async (req, res) => {
       name: c.name,
       spent: sales.filter(s => s.id_customer === c.id).reduce((s, sale) => s + Number(sale.total_amount || 0), 0)
     })).sort((a, b) => b.spent - a.spent).slice(0, 5);
-
     res.render("index", {
       title: "Дашборд", activePage: "dashboard",
       stats: {
@@ -85,7 +80,6 @@ router.get("/", requireLogin, async (req, res) => {
     res.render("error", { title: "Ошибка", message: err.message, activePage: "error" });
   }
 });
-
 // Продажи
 router.get("/sales", requireLogin, async (req, res) => {
   try {
@@ -105,7 +99,6 @@ router.get("/sales", requireLogin, async (req, res) => {
     res.render("error", { title: "Ошибка", message: err.message, activePage: "error" });
   }
 });
-
 // Склад
 router.get("/inventory", requireLogin, async (req, res) => {
   try {
@@ -139,8 +132,7 @@ router.get("/shipments", requireLogin, requireRole(["admin", "manager"]), async 
     res.render("error", { title: "Ошибка", message: err.message, activePage: "error" });
   }
 });
-
-// Расходы (только manager + admin)
+// Расходы только manager + admin
 router.get("/expenses", requireLogin, requireRole(["admin", "manager"]), async (req, res) => {
   try {
     const expenses = await db.expense.findAll({ order: [["date", "DESC"]] });
@@ -149,8 +141,7 @@ router.get("/expenses", requireLogin, requireRole(["admin", "manager"]), async (
     res.render("error", { title: "Ошибка", message: err.message, activePage: "error" });
   }
 });
-
-// Отчёты (только manager + admin)
+// Отчёты только manager + admin
 router.get("/reports", requireLogin, requireRole(["admin", "manager"]), async (req, res) => {
   try {
     const groups = await db.productGroup.findAll();
@@ -160,7 +151,6 @@ router.get("/reports", requireLogin, requireRole(["admin", "manager"]), async (r
     res.render("error", { title: "Ошибка", message: err.message, activePage: "error" });
   }
 });
-
 // Управление пользователями (только admin)
 router.get("/users", requireLogin, requireRole(["admin"]), async (req, res) => {
   try {
@@ -170,11 +160,7 @@ router.get("/users", requireLogin, requireRole(["admin"]), async (req, res) => {
     res.render("error", { title: "Ошибка", message: err.message, activePage: "error" });
   }
 });
-
-// ══════════════════════════════════════════════
-//  API ПОЛЬЗОВАТЕЛЕЙ (только admin)
-// ══════════════════════════════════════════════
-
+//  API только admin
 router.post("/api/users", requireLogin, requireRole(["admin"]), async (req, res) => {
   const { username, password, role, full_name } = req.body;
   if (!username || !password) return res.status(400).json({ message: "Логин и пароль обязательны" });
@@ -186,7 +172,6 @@ router.post("/api/users", requireLogin, requireRole(["admin"]), async (req, res)
     res.status(500).json({ message: err.message || "Ошибка при создании пользователя" });
   }
 });
-
 router.put("/api/users/:id/role", requireLogin, requireRole(["admin"]), async (req, res) => {
   const { role } = req.body;
   try {
@@ -196,7 +181,6 @@ router.put("/api/users/:id/role", requireLogin, requireRole(["admin"]), async (r
     res.status(500).json({ message: err.message });
   }
 });
-
 router.delete("/api/users/:id", requireLogin, requireRole(["admin"]), async (req, res) => {
   if (parseInt(req.params.id) === req.session.user.id) {
     return res.status(400).json({ message: "Нельзя удалить самого себя" });
@@ -208,11 +192,7 @@ router.delete("/api/users/:id", requireLogin, requireRole(["admin"]), async (req
     res.status(500).json({ message: err.message });
   }
 });
-
-// ══════════════════════════════════════════════
 //  API ОТЧЁТОВ
-// ══════════════════════════════════════════════
-
 // Отчёт 1: Выручка по периоду
 router.get("/api/reports/revenue", requireLogin, requireRole(["admin", "manager"]), async (req, res) => {
   const { date_from, date_to } = req.query;
@@ -220,7 +200,6 @@ router.get("/api/reports/revenue", requireLogin, requireRole(["admin", "manager"
   const replacements = {};
   if (date_from) { where += " AND sale_date >= :date_from"; replacements.date_from = date_from; }
   if (date_to) { where += " AND sale_date <= :date_to::date + interval '1 day'"; replacements.date_to = date_to; }
-
   try {
     const rows = await db.sequelize.query(`
       SELECT
@@ -232,7 +211,6 @@ router.get("/api/reports/revenue", requireLogin, requireRole(["admin", "manager"
       GROUP BY DATE(sale_date)
       ORDER BY DATE(sale_date)
     `, { replacements, type: QueryTypes.SELECT });
-
     const totals = {
       revenue: rows.reduce((s, r) => s + Number(r.revenue || 0), 0).toFixed(2),
       count: rows.reduce((s, r) => s + Number(r.count || 0), 0),
@@ -243,7 +221,6 @@ router.get("/api/reports/revenue", requireLogin, requireRole(["admin", "manager"
     res.status(500).json({ message: err.message });
   }
 });
-
 // Отчёт 2: Топ товаров
 router.get("/api/reports/top-products", requireLogin, requireRole(["admin", "manager"]), async (req, res) => {
   const { category_id, date_from, date_to } = req.query;
@@ -253,7 +230,6 @@ router.get("/api/reports/top-products", requireLogin, requireRole(["admin", "man
   if (date_from) { saleWhere += " AND s.sale_date >= :date_from"; replacements.date_from = date_from; }
   if (date_to) { saleWhere += " AND s.sale_date <= :date_to::date + interval '1 day'"; replacements.date_to = date_to; }
   if (category_id) { prodWhere = "AND p.id_category = :category_id"; replacements.category_id = category_id; }
-
   try {
     const data = await db.sequelize.query(`
       SELECT
@@ -274,7 +250,6 @@ router.get("/api/reports/top-products", requireLogin, requireRole(["admin", "man
     res.status(500).json({ message: err.message });
   }
 });
-
 // Отчёт 3: Клиенты
 router.get("/api/reports/customers", requireLogin, requireRole(["admin", "manager"]), async (req, res) => {
   const { min_spent = 0, min_orders = 0 } = req.query;
@@ -298,7 +273,6 @@ router.get("/api/reports/customers", requireLogin, requireRole(["admin", "manage
     res.status(500).json({ message: err.message });
   }
 });
-
 // Отчёт 4: Поставки по поставщикам
 router.get("/api/reports/shipments", requireLogin, requireRole(["admin", "manager"]), async (req, res) => {
   const { provider_id, date_from, date_to } = req.query;
@@ -307,7 +281,6 @@ router.get("/api/reports/shipments", requireLogin, requireRole(["admin", "manage
   if (provider_id) { where += " AND sh.provider_id = :provider_id"; replacements.provider_id = provider_id; }
   if (date_from) { where += " AND sh.purchase_date >= :date_from"; replacements.date_from = date_from; }
   if (date_to) { where += " AND sh.purchase_date <= :date_to::date + interval '1 day'"; replacements.date_to = date_to; }
-
   try {
     const data = await db.sequelize.query(`
       SELECT
@@ -327,7 +300,6 @@ router.get("/api/reports/shipments", requireLogin, requireRole(["admin", "manage
     res.status(500).json({ message: err.message });
   }
 });
-
 // Отчёт 5: Прибыль по месяцам
 router.get("/api/reports/profit", requireLogin, requireRole(["admin"]), async (req, res) => {
   const { year = new Date().getFullYear() } = req.query;
@@ -357,7 +329,6 @@ router.get("/api/reports/profit", requireLogin, requireRole(["admin"]), async (r
     res.status(500).json({ message: err.message });
   }
 });
-
 // Отчёт 6: ABC-анализ
 router.get("/api/reports/abc", requireLogin, requireRole(["admin"]), async (req, res) => {
   const { category_id } = req.query;
@@ -377,5 +348,4 @@ router.get("/api/reports/abc", requireLogin, requireRole(["admin"]), async (req,
     res.status(500).json({ message: err.message });
   }
 });
-
 module.exports = router;

@@ -17,7 +17,6 @@ exports.create = (req, res) => {
     .then(data => res.send(data))
     .catch(err => res.status(500).send({ message: err.message || "Error creating Customer." }));
 };
-
 exports.findAll = (req, res) => {
   const name = req.query.name;
   var condition = name ? { name: { [Op.iLike]: `%${name}%` } } : null;
@@ -25,7 +24,6 @@ exports.findAll = (req, res) => {
     .then(data => res.send(data))
     .catch(err => res.status(500).send({ message: "Error retrieving customers." }));
 };
-
 exports.findOne = (req, res) => {
   const id = req.params.id;
   Customer.findByPk(id)

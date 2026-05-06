@@ -71,6 +71,35 @@ async function seed() {
       customerInstances.push(cust);
     }
 
+    // 5.5 Поставщики и Поставки
+    const providersList = ["Эквадор Флауэрс", "Кения Роуз", "Голландия Опт", "Местные Теплицы", "GreenHouse Corp"];
+    const providerInstances = [];
+    for (const org of providersList) {
+      const [prov] = await db.provider.findOrCreate({ where: { organization_name: org } });
+      providerInstances.push(prov);
+    }
+    console.log("✔ Providers seeded.");
+
+    // Дополнительно: Создаем историю поставок (Shipments)
+    console.log("Generating shipments...");
+    for (const p of allProducts) {
+      // 1-2 поставки на товар
+      const shipCount = Math.floor(Math.random() * 2) + 1;
+      for (let s = 0; s < shipCount; s++) {
+        const provider = providerInstances[Math.floor(Math.random() * providerInstances.length)];
+        const month = Math.floor(Math.random() * 4) + 1; // 1-4
+        const day = Math.floor(Math.random() * 28) + 1;
+        await db.shipment.create({
+          product_id: p.id,
+          provider_id: provider.id,
+          count: 20 + Math.floor(Math.random() * 100),
+          unit_price: p.cost_price,
+          purchase_date: new Date(2026, month, day)
+        });
+      }
+    }
+    console.log("✔ Shipments seeded.");
+
     // 6. Расходы (за последние 3 месяца)
     const expCats = ["Аренда", "Зарплата", "Закупки", "Реклама", "Налоги"];
     for (let m = 1; m <= 3; m++) {

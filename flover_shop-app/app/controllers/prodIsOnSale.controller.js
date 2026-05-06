@@ -18,15 +18,6 @@ exports.findBySaleId = async (req, res) => {
   }
 };
 
-/**
- * Создать позицию в чеке.
- * Внутри транзакции:
- *  1. Блокируем строку товара (SELECT FOR UPDATE).
- *  2. Проверяем остаток.
- *  3. Если недостаточно — откатываем и возвращаем 409.
- *  4. Декрементируем quantity.
- *  5. Создаём запись ProdIsOnSale.
- */
 exports.create = async (req, res) => {
   const { id_product, id_sale, quantity, price } = req.body;
 

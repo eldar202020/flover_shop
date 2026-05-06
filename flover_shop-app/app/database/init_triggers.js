@@ -1,8 +1,4 @@
-/**
- * init_triggers.js
- * Создаёт хранимые процедуры (функции) и триггеры в PostgreSQL
- * Вызывается ПОСЛЕ db.sync() в server.js
- */
+
 
 const { QueryTypes } = require("sequelize");
 
